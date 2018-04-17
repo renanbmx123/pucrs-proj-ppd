@@ -27,13 +27,18 @@ solicita_abertura_100_svc(transacao *argp, struct svc_req *rqstp)
 
 	for(i = 0; i < 50; i++){
 		if(CONTAS[i] == NULL){
+			printf("NOVO CLIENTE EM: %d\n", i);
+			(argp->conta_cliente).ID = i;
+			(argp->conta_cliente).Saldo = 0;
 			CONTAS[i] = &(argp->conta_cliente);
-			CONTAS[i]->ID = i;
-			CONTAS[i]->Saldo = 0;
 			result = 1;
+			break;
 		}
 		else result = -1;
 	}
+
+	*argp = NULL;
+	if(*argp == NULL) puts("transacao em NULL");
 
 	return &result;
 }
@@ -42,10 +47,17 @@ int *
 solicita_autenticacao_100_svc(transacao *argp, struct svc_req *rqstp)
 {
 	static int  result;
+	int i;
 
-	/*
-	 * insert server code here
-	 */
+	for(i = 0; i < 50; i++){
+		if(CONTAS[i] == NULL) continue;
+		if(CONTAS[i]->ID == (argp->conta_cliente).ID){
+			result = 1;
+			break;
+		}
+	}
+	
+	result = -1;
 
 	return &result;
 }
