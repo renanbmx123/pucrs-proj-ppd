@@ -25,7 +25,6 @@ prog_100(char *host)
 	transacao  solicita_retirada_100_arg;
 	int  *result_7;
 	transacao  solicita_consulta_100_arg;
-	int i = 0;
 
 #ifndef	DEBUG
 	clnt = clnt_create (host, PROG, VERSAO, "udp");
@@ -35,17 +34,10 @@ prog_100(char *host)
 	}
 #endif	/* DEBUG */
 
-	for(i = 0; i < 10; i++){
-		result_1 = solicita_codigo_100((void*)&solicita_codigo_100_arg, clnt);
-		if (result_1 == (int *) NULL) {
-			clnt_perror (clnt, "call failed");
-		}else{
-			printf("%d\n", &result_1);
-		}
+	result_1 = solicita_codigo_100((void*)&solicita_codigo_100_arg, clnt);
+	if (result_1 == (int *) NULL) {
+		clnt_perror (clnt, "call failed");
 	}
-
-	return;
-
 	result_2 = solicita_abertura_100(&solicita_abertura_100_arg, clnt);
 	if (result_2 == (int *) NULL) {
 		clnt_perror (clnt, "call failed");

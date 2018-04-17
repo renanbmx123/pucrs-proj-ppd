@@ -6,14 +6,14 @@
 
 #include "logica.h"
 
+int codigo_atual = 0;
+
 int *
 solicita_codigo_100_svc(void *argp, struct svc_req *rqstp)
 {
 	static int  result;
 
-	/*
-	 * insert server code here
-	 */
+	result = codigo_atual++;
 
 	return &result;
 }
