@@ -7,6 +7,7 @@
 #include "logica.h"
 
 int codigo_atual = 0;
+conta* CONTAS[50];
 
 int *
 solicita_codigo_100_svc(void *argp, struct svc_req *rqstp)
@@ -22,10 +23,17 @@ int *
 solicita_abertura_100_svc(transacao *argp, struct svc_req *rqstp)
 {
 	static int  result;
+	int i;
 
-	/*
-	 * insert server code here
-	 */
+	for(i = 0; i < 50; i++){
+		if(CONTAS[i] == NULL){
+			CONTAS[i] = &(argp->conta_cliente);
+			CONTAS[i]->ID = i;
+			CONTAS[i]->Saldo = 0;
+			result = 1;
+		}
+		else result = -1;
+	}
 
 	return &result;
 }
