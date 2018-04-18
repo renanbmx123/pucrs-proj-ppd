@@ -1,11 +1,12 @@
 #include "stdlib.h"
 #include "list.h"
+#include <string.h>
 
 void list_push(List *l, void *data, size_t data_size){
     Node *node = malloc(sizeof(Node));
     node->next = NULL;
     node->value = malloc(data_size);
-    memcpy(n->value, data, data_size);
+    memcpy(node->value, data, data_size);
     if(l->head == NULL){
         l->head = node;
     }
@@ -28,7 +29,7 @@ void *list_get(List *l, int index){
     return NULL;
 }
 
-int *list_set(List *l, int index, void *data, size_t data_size){
+int list_set(List *l, int index, void *data, size_t data_size){
     int result = 0, i = 0; 
     Node *n = l->head;
     while(n != NULL){

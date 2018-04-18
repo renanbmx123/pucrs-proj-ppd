@@ -14,7 +14,7 @@ int FAIL_FLAG = FALSE;
 int valida_codigo(int codigo){
 	int result = 0;
 	//Percorre a lista 'codigos' procurando 'codigo'
-	Node *n = codigos->head;
+	Node *n = codigos.head;
 	while(n != NULL){
 		if(*((int*)(n->value)) == codigo){
 			result = 1;
@@ -29,7 +29,7 @@ int valida_codigo(int codigo){
 int desativa_codigo(int codigo){
 	int result = 0;
 
-	Node *n = codigos->head;
+	Node *n = codigos.head;
 	while(n != NULL){
 		if(*((int*)(n->value)) == codigo){
 			free(n->value);
@@ -49,7 +49,7 @@ solicita_codigo_100_svc(void *argp, struct svc_req *rqstp)
 	static int  result;
 	static int codigo = 0;
 
-	list_push(codigos, &codigo, sizeof(codigo));
+	list_push(&codigos, &codigo, sizeof(codigo));
 
 	result = codigo++;
 
@@ -70,7 +70,7 @@ solicita_abertura_100_svc(int *argp, struct svc_req *rqstp)
 	if(!desativa_codigo(*argp)){
 		printf("NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %d\n", *argp);
 	}
-	if(FAIL_FLAG){ result = NULL; }
+	if(FAIL_FLAG){ return NULL; }
 	return &result;
 }
 
@@ -81,7 +81,7 @@ solicita_autenticacao_100_svc(transacao *argp, struct svc_req *rqstp)
 	result = 0;
 
 	if(valida_codigo(argp->codigo)){
-		Node *n = contas->head;
+		Node *n = contas.head;
 		while(n != NULL){
 			conta *conta_cliente = (conta*)(n->value);
 			if(conta_cliente != NULL){
@@ -101,7 +101,7 @@ solicita_autenticacao_100_svc(transacao *argp, struct svc_req *rqstp)
 	if(!desativa_codigo(argp->codigo)){
 		printf("NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %d\n", argp->codigo);
 	}
-	if(FAIL_FLAG){ result = NULL; }
+	if(FAIL_FLAG){ return NULL; }
 	return &result;
 }
 
@@ -119,7 +119,7 @@ solicita_fechamento_100_svc(transacao *argp, struct svc_req *rqstp)
 	if(!desativa_codigo(argp->codigo)){
 		printf("NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %d\n", argp->codigo);
 	}
-	if(FAIL_FLAG){ result = NULL; }
+	if(FAIL_FLAG){ return NULL; }
 	return &result;
 }
 
@@ -130,7 +130,7 @@ solicita_deposito_100_svc(transacao *argp, struct svc_req *rqstp)
 	result = 0;
 
 	if(valida_codigo(argp->codigo)){
-		Node *n = contas->head;
+		Node *n = contas.head;
 		while(n != NULL){
 			conta *conta_cliente = (conta*)(n->value);
 			if(conta_cliente != NULL){
@@ -151,7 +151,7 @@ solicita_deposito_100_svc(transacao *argp, struct svc_req *rqstp)
 	if(!desativa_codigo(argp->codigo)){
 		printf("NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %d\n", argp->codigo);
 	}
-	if(FAIL_FLAG){ result = NULL; }
+	if(FAIL_FLAG){ return NULL; }
 	return &result;
 }
 
@@ -162,7 +162,7 @@ solicita_retirada_100_svc(transacao *argp, struct svc_req *rqstp)
 	result = 0;
 
 	if(valida_codigo(argp->codigo)){
-		Node *n = contas->head;
+		Node *n = contas.head;
 		while(n != NULL){
 			conta *conta_cliente = (conta*)(n->value);
 			if(conta_cliente != NULL){
@@ -183,7 +183,7 @@ solicita_retirada_100_svc(transacao *argp, struct svc_req *rqstp)
 	if(!desativa_codigo(argp->codigo)){
 		printf("NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %d\n", argp->codigo);
 	}
-	if(FAIL_FLAG){ result = NULL; }
+	if(FAIL_FLAG){ return NULL; }
 	return &result;
 }
 
@@ -198,7 +198,7 @@ solicita_consulta_100_svc(transacao *argp, struct svc_req *rqstp)
 
 	if(valida_codigo(argp->codigo)){
 		int sucesso = 0;
-		Node *n = contas->head;
+		Node *n = contas.head;
 		while(n != NULL){
 			conta *conta_cliente = (conta*)(n->value);
 			if(conta_cliente != NULL){
@@ -219,6 +219,6 @@ solicita_consulta_100_svc(transacao *argp, struct svc_req *rqstp)
 	if(!desativa_codigo(argp->codigo)){
 		printf("NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %d\n", argp->codigo);
 	}
-	if(FAIL_FLAG){ result = NULL; }
+	if(FAIL_FLAG){ return NULL; }
 	return &result;
 }
