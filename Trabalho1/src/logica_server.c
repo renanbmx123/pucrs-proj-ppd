@@ -94,6 +94,14 @@ solicita_codigo_100_svc(void *argp, struct svc_req *rqstp)
 
 	list_push(&codigos, &codigo, sizeof(codigo));
 	cprintf(CYELLOW, "[CODIGO %02d SOLICITADO]", codigo);
+
+	if(!(codigo % 5) && codigo > 0){
+		FAIL_FLAG = 1;
+		cprintf(CCYAN, "%s", "FAIL_FLAG SET");
+	}else{
+		FAIL_FLAG = 0;
+	}
+
 	result = codigo++;
 
 	return &result;
@@ -111,19 +119,17 @@ solicita_abertura_100_svc(int *argp, struct svc_req *rqstp)
 			nova_conta.ID = 1;
 		}
 		else{
-			conta *ultima_conta = (conta *)(contas.tail);
+			conta *ultima_conta = (conta *)((contas.tail)->value);
 			nova_conta.ID = ultima_conta->ID + 1;
 		}
 		nova_conta.Saldo = 0;
 		list_push(&contas, (void *)&nova_conta, sizeof(nova_conta));
 		result = nova_conta.ID;
-	}
-	else
-	{
+		if(!desativa_codigo(*argp)){
+			cprintf(CRED, "[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]", *argp);
+		}
+	}else{
 		cprintf(CRED, "[NÃO FOI POSSÍVEL VALIDAR O CÓDIGO %02d]", *argp);
-	}
-	if(!desativa_codigo(*argp)){
-		cprintf(CRED, "[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]", *argp);
 	}
 	if(FAIL_FLAG){ return NULL; }
 	return &result;
@@ -141,11 +147,11 @@ solicita_autenticacao_100_svc(transacao *argp, struct svc_req *rqstp)
 		}else{
 			cprintf(CRED, "[NÃO FOI POSSÍVEL AUTENTICAR A CONTA %02d]", argp->ID);
 		}
+		if(!desativa_codigo(argp->codigo)){
+			cprintf(CRED, "[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]", argp->codigo);
+		}
 	}else{
 		cprintf(CRED, "[NÃO FOI POSSÍVEL VALIDAR O CÓDIGO %02d]", argp->codigo);
-	}
-	if(!desativa_codigo(argp->codigo)){
-		cprintf(CRED, "[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]", argp->codigo);
 	}
 	if(FAIL_FLAG){ return NULL; }
 	return &result;
@@ -179,11 +185,11 @@ solicita_fechamento_100_svc(transacao *argp, struct svc_req *rqstp)
 			}
 		}
 		n = n->next;
+		if(!desativa_codigo(argp->codigo)){
+			cprintf(CRED, "[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]", argp->codigo);
+		}
 	}else{
 		cprintf(CRED, "[NÃO FOI POSSÍVEL VALIDAR O CÓDIGO %02d]", argp->codigo);
-	}
-	if(!desativa_codigo(argp->codigo)){
-		cprintf(CRED, "[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]", argp->codigo);
 	}
 	if(FAIL_FLAG){ return NULL; }
 	return &result;
@@ -203,11 +209,11 @@ solicita_deposito_100_svc(transacao *argp, struct svc_req *rqstp)
 		}else{
 			printf("CRED[NÃO FOI POSSÍVEL DEPOSITAR %.2f NA CONTA %d\n]CRESET", argp->valor, argp->ID);
 		}
+		if(!desativa_codigo(argp->codigo)){
+			cprintf(CRED, "[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]", argp->codigo);
+		}
 	}else{
 		cprintf(CRED, "[NÃO FOI POSSÍVEL VALIDAR O CÓDIGO %02d]", argp->codigo);
-	}
-	if(!desativa_codigo(argp->codigo)){
-		cprintf(CRED, "[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]", argp->codigo);
 	}
 	if(FAIL_FLAG){ return NULL; }
 	return &result;
@@ -227,11 +233,11 @@ solicita_retirada_100_svc(transacao *argp, struct svc_req *rqstp)
 		}else{
 			printf("CRED[NÃO FOI POSSÍVEL RETIRAR %.2f DA CONTA %d]CRESET\n", argp->valor, argp->ID);
 		}
+		if(!desativa_codigo(argp->codigo)){
+			cprintf(CRED, "[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]", argp->codigo);
+		}
 	}else{
 		cprintf(CRED, "[NÃO FOI POSSÍVEL VALIDAR O CÓDIGO %02d]", argp->codigo);
-	}
-	if(!desativa_codigo(argp->codigo)){
-		cprintf(CRED, "[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]", argp->codigo);
 	}
 	if(FAIL_FLAG){ return NULL; }
 	return &result;
@@ -242,6 +248,7 @@ solicita_consulta_100_svc(transacao *argp, struct svc_req *rqstp)
 {
 	static conta result;
 	conta conta_vazia;
+	conta_vazia.ID = 0;
 	result = conta_vazia;
 
 	if(valida_codigo(argp->codigo)){
@@ -251,11 +258,11 @@ solicita_consulta_100_svc(transacao *argp, struct svc_req *rqstp)
 		}else{
 			printf("CRED[NÃO FOI POSSÍVEL CONSULTAR A CONTA %02d]CRESET\n", argp->ID);
 		}
+		if(!desativa_codigo(argp->codigo)){
+			cprintf(CRED, "[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]", argp->codigo);
+		}
 	}else{
 		cprintf(CRED, "[NÃO FOI POSSÍVEL VALIDAR O CÓDIGO %02d]", argp->codigo);
-	}
-	if(!desativa_codigo(argp->codigo)){
-		cprintf(CRED, "[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]", argp->codigo);
 	}
 	if(FAIL_FLAG){ return NULL; }
 	return &result;

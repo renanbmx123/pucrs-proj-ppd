@@ -41,12 +41,31 @@ prog_100(char *host)
 //AGENCIA
 	r = solicita_codigo_100(NULL, clnt);
 	r = solicita_abertura_100(r, clnt);
+	if(r == NULL || !(*r)){
+		puts("Resposta nula. Tentando novamente (1)");
+		r = solicita_codigo_100(NULL, clnt);
+		r = solicita_abertura_100(r, clnt);
+	}
+
 	ID = *r;
 	printf("ID: %d\n", ID);
+
 	t = solicita_transacao(clnt, ID, 100);
 	r = solicita_deposito_100(&t, clnt);
+	if(r == NULL || !(*r)){
+		puts("Resposta inválida. Tentando novamente (2)");
+		t = solicita_transacao(clnt, ID, 100);
+		r = solicita_deposito_100(&t, clnt);
+	}
+
 	t = solicita_transacao(clnt, ID, 0);
 	c = solicita_consulta_100(&t, clnt);
+	if(c == NULL || !c->ID){
+		puts("Resposta inválida. Tentando novamente (3)");
+		t = solicita_transacao(clnt, ID, 0);
+		c = solicita_consulta_100(&t, clnt);
+	}
+
 	printf("ID: %d\nSaldo: %.2f\n", c->ID, c->Saldo);
 	/*result_1 = solicita_codigo_100((void*)&solicita_codigo_100_arg, clnt);
 	if (result_1 == (int *) NULL) {
