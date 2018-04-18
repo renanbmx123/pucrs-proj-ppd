@@ -20,7 +20,7 @@ static void
 prog_100(struct svc_req *rqstp, register SVCXPRT *transp)
 {
 	union {
-		transacao solicita_abertura_100_arg;
+		int solicita_abertura_100_arg;
 		transacao solicita_autenticacao_100_arg;
 		transacao solicita_fechamento_100_arg;
 		transacao solicita_deposito_100_arg;
@@ -43,7 +43,7 @@ prog_100(struct svc_req *rqstp, register SVCXPRT *transp)
 		break;
 
 	case solicita_abertura:
-		_xdr_argument = (xdrproc_t) xdr_transacao;
+		_xdr_argument = (xdrproc_t) xdr_int;
 		_xdr_result = (xdrproc_t) xdr_int;
 		local = (char *(*)(char *, struct svc_req *)) solicita_abertura_100_svc;
 		break;
@@ -74,7 +74,7 @@ prog_100(struct svc_req *rqstp, register SVCXPRT *transp)
 
 	case solicita_consulta:
 		_xdr_argument = (xdrproc_t) xdr_transacao;
-		_xdr_result = (xdrproc_t) xdr_int;
+		_xdr_result = (xdrproc_t) xdr_conta;
 		local = (char *(*)(char *, struct svc_req *)) solicita_consulta_100_svc;
 		break;
 

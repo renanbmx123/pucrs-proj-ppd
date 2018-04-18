@@ -13,10 +13,18 @@ prog_100(char *host)
 	CLIENT *clnt;
 	int  *result_1;
 	char *solicita_codigo_100_arg;
-	
-	int *r;
-	transacao TRANSACAO;
-	int i = 0;
+	int  *result_2;
+	int  solicita_abertura_100_arg;
+	int  *result_3;
+	transacao  solicita_autenticacao_100_arg;
+	int  *result_4;
+	transacao  solicita_fechamento_100_arg;
+	int  *result_5;
+	transacao  solicita_deposito_100_arg;
+	int  *result_6;
+	transacao  solicita_retirada_100_arg;
+	conta  *result_7;
+	transacao  solicita_consulta_100_arg;
 
 #ifndef	DEBUG
 	clnt = clnt_create (host, PROG, VERSAO, "udp");
@@ -26,15 +34,11 @@ prog_100(char *host)
 	}
 #endif	/* DEBUG */
 
-	//LOGICA AGENCIA
-	//SOLICITA ABERTURA
-	r = solicita_abertura_100(&TRANSACAO, clnt);
-	if(r == (int *) NULL) { puts("Erro!"); }
-	else {
-		printf("ID do Cliente: %d\n",TRANSACAO.conta_cliente.ID);
+	result_1 = solicita_codigo_100((void*)&solicita_codigo_100_arg, clnt);
+	if (result_1 == (int *) NULL) {
+		clnt_perror (clnt, "call failed");
 	}
-
-	/*result_2 = solicita_abertura_100(&solicita_abertura_100_arg, clnt);
+	result_2 = solicita_abertura_100(&solicita_abertura_100_arg, clnt);
 	if (result_2 == (int *) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
@@ -55,10 +59,9 @@ prog_100(char *host)
 		clnt_perror (clnt, "call failed");
 	}
 	result_7 = solicita_consulta_100(&solicita_consulta_100_arg, clnt);
-	if (result_7 == (int *) NULL) {
+	if (result_7 == (conta *) NULL) {
 		clnt_perror (clnt, "call failed");
-	}*/
-end:
+	}
 #ifndef	DEBUG
 	clnt_destroy (clnt);
 #endif	 /* DEBUG */

@@ -21,7 +21,7 @@ struct conta {
 typedef struct conta conta;
 
 struct transacao {
-	conta conta_cliente;
+	int ID;
 	int codigo;
 	double valor;
 };
@@ -35,8 +35,8 @@ typedef struct transacao transacao;
 extern  int * solicita_codigo_100(void *, CLIENT *);
 extern  int * solicita_codigo_100_svc(void *, struct svc_req *);
 #define solicita_abertura 2
-extern  int * solicita_abertura_100(transacao *, CLIENT *);
-extern  int * solicita_abertura_100_svc(transacao *, struct svc_req *);
+extern  int * solicita_abertura_100(int *, CLIENT *);
+extern  int * solicita_abertura_100_svc(int *, struct svc_req *);
 #define solicita_autenticacao 3
 extern  int * solicita_autenticacao_100(transacao *, CLIENT *);
 extern  int * solicita_autenticacao_100_svc(transacao *, struct svc_req *);
@@ -50,8 +50,8 @@ extern  int * solicita_deposito_100_svc(transacao *, struct svc_req *);
 extern  int * solicita_retirada_100(transacao *, CLIENT *);
 extern  int * solicita_retirada_100_svc(transacao *, struct svc_req *);
 #define solicita_consulta 7
-extern  int * solicita_consulta_100(transacao *, CLIENT *);
-extern  int * solicita_consulta_100_svc(transacao *, struct svc_req *);
+extern  conta * solicita_consulta_100(transacao *, CLIENT *);
+extern  conta * solicita_consulta_100_svc(transacao *, struct svc_req *);
 extern int prog_100_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 
 #else /* K&R C */
@@ -74,8 +74,8 @@ extern  int * solicita_deposito_100_svc();
 extern  int * solicita_retirada_100();
 extern  int * solicita_retirada_100_svc();
 #define solicita_consulta 7
-extern  int * solicita_consulta_100();
-extern  int * solicita_consulta_100_svc();
+extern  conta * solicita_consulta_100();
+extern  conta * solicita_consulta_100_svc();
 extern int prog_100_freeresult ();
 #endif /* K&R C */
 

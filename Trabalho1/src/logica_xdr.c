@@ -22,7 +22,7 @@ xdr_transacao (XDR *xdrs, transacao *objp)
 {
 	register int32_t *buf;
 
-	 if (!xdr_conta (xdrs, &objp->conta_cliente))
+	 if (!xdr_int (xdrs, &objp->ID))
 		 return FALSE;
 	 if (!xdr_int (xdrs, &objp->codigo))
 		 return FALSE;

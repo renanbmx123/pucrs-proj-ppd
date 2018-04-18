@@ -25,13 +25,13 @@ solicita_codigo_100(void *argp, CLIENT *clnt)
 }
 
 int *
-solicita_abertura_100(transacao *argp, CLIENT *clnt)
+solicita_abertura_100(int *argp, CLIENT *clnt)
 {
 	static int clnt_res;
 
 	memset((char *)&clnt_res, 0, sizeof(clnt_res));
 	if (clnt_call (clnt, solicita_abertura,
-		(xdrproc_t) xdr_transacao, (caddr_t) argp,
+		(xdrproc_t) xdr_int, (caddr_t) argp,
 		(xdrproc_t) xdr_int, (caddr_t) &clnt_res,
 		TIMEOUT) != RPC_SUCCESS) {
 		return (NULL);
@@ -99,15 +99,15 @@ solicita_retirada_100(transacao *argp, CLIENT *clnt)
 	return (&clnt_res);
 }
 
-int *
+conta *
 solicita_consulta_100(transacao *argp, CLIENT *clnt)
 {
-	static int clnt_res;
+	static conta clnt_res;
 
 	memset((char *)&clnt_res, 0, sizeof(clnt_res));
 	if (clnt_call (clnt, solicita_consulta,
 		(xdrproc_t) xdr_transacao, (caddr_t) argp,
-		(xdrproc_t) xdr_int, (caddr_t) &clnt_res,
+		(xdrproc_t) xdr_conta, (caddr_t) &clnt_res,
 		TIMEOUT) != RPC_SUCCESS) {
 		return (NULL);
 	}
