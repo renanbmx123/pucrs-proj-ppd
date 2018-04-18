@@ -40,7 +40,9 @@ int desativa_codigo(int codigo){
 	Node *n = codigos.head;
 	if(list_size(&codigos)==1){
 		codigos.head = NULL;
-		printf("CGREEN[CODIGO %02d DESATIVADO]CRESET\n", codigo);
+		printf(CGREEN);
+		printf("[CODIGO %02d DESATIVADO]", codigo);
+		puts(CRESET);
 		return 1;
 	}
 	else if (list_size(&codigos) == 2)

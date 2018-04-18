@@ -6,11 +6,28 @@
 
 #include "logica.h"
 
+transacao solicita_transacao(CLIENT *clnt, int ID, double valor){
+	transacao Transacao;
+	int *r;
+
+	Transacao.ID = ID;
+	Transacao.valor = valor;
+	r = solicita_codigo_100(NULL, clnt);
+	if(r == (int*) NULL){
+		clnt_perror(clnt, "call failed");
+		exit(-1);
+	}
+	Transacao.codigo = *r;
+
+	return Transacao;
+}
 
 void
 prog_100(char *host)
 {
 	CLIENT *clnt;
+	transacao t;
+	int *r;
 
 #ifndef	DEBUG
 	clnt = clnt_create (host, PROG, VERSAO, "udp");
@@ -21,9 +38,10 @@ prog_100(char *host)
 #endif	/* DEBUG */
 
 //AGENCIA
-//solicita_codigo
-//solicita_abertura
-//solicita_fechamento
+	r = solicita_codigo_100(NULL, clnt);
+	r = solicita_abertura_100(r, clnt);
+	t = solicita_transacao(clnt, *r, 100);
+	r = solicita_deposito_100(&t, clnt);
 
 	/*result_1 = solicita_codigo_100((void*)&solicita_codigo_100_arg, clnt);
 	if (result_1 == (int *) NULL) {
