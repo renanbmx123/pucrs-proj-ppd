@@ -15,6 +15,11 @@
 #define CCYAN    "\x1b[36m"
 #define CRESET   "\x1b[0m"
 
+#define cprintf(c, f_, ...)    \
+	printf(c);                 \
+	printf((f_), __VA_ARGS__); \
+	puts(CRESET)
+
 List contas;
 List codigos;
 int FAIL_FLAG = FALSE;
@@ -25,7 +30,7 @@ int valida_codigo(int codigo){
 	Node *n = codigos.head;
 	while(n != NULL){
 		if(*((int*)(n->value)) == codigo){
-			printf("CGREEN[CODIGO %02d VALIDADO]CRESET\n", codigo);
+			cprintf(CGREEN,"[CODIGO %02d VALIDADO]", codigo);
 			result = 1;
 			break;
 		}
@@ -40,15 +45,13 @@ int desativa_codigo(int codigo){
 	Node *n = codigos.head;
 	if(list_size(&codigos)==1){
 		codigos.head = NULL;
-		printf(CGREEN);
-		printf("[CODIGO %02d DESATIVADO]", codigo);
-		puts(CRESET);
+		cprintf(CGREEN,"[CODIGO %02d DESATIVADO]", codigo);
 		return 1;
 	}
 	else if (list_size(&codigos) == 2)
 	{
 		codigos.head = codigos.head->next;
-		printf("CGREEN[CODIGO %02d DESATIVADO]CRESET\n", codigo);
+		cprintf(CGREEN,"[CODIGO %02d DESATIVADO]", codigo);
 		return 1;
 	}
 	while(n->next != NULL){
@@ -56,7 +59,7 @@ int desativa_codigo(int codigo){
 		if(*((int*)(aux->value)) == codigo){
 			n->next = aux->next;
 			free(aux);
-			printf("CGREEN[CODIGO %02d DESATIVADO]CRESET\n", codigo);
+			cprintf(CGREEN,"[CODIGO %02d DESATIVADO]", codigo);
 			return 1;
 			break;
 		}
@@ -90,7 +93,7 @@ solicita_codigo_100_svc(void *argp, struct svc_req *rqstp)
 	static int codigo = 0;
 
 	list_push(&codigos, &codigo, sizeof(codigo));
-	printf("CYELLOW[CODIGO %02d SOLICITADO]CRESET\n", codigo);
+	cprintf(CYELLOW, "[CODIGO %02d SOLICITADO]", codigo);
 	result = codigo++;
 
 	return &result;
@@ -117,10 +120,10 @@ solicita_abertura_100_svc(int *argp, struct svc_req *rqstp)
 	}
 	else
 	{
-		printf("CRED[NÃO FOI POSSÍVEL VALIDAR O CÓDIGO %02d]CRESET\n", *argp);
+		cprintf(CRED, "[NÃO FOI POSSÍVEL VALIDAR O CÓDIGO %02d]", *argp);
 	}
 	if(!desativa_codigo(*argp)){
-		printf("CRED[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]CRESET\n", *argp);
+		cprintf(CRED, "[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]", *argp);
 	}
 	if(FAIL_FLAG){ return NULL; }
 	return &result;
@@ -136,13 +139,13 @@ solicita_autenticacao_100_svc(transacao *argp, struct svc_req *rqstp)
 		if(procura_conta(argp->ID) != NULL){
 			result = 1;
 		}else{
-			printf("CRED[NÃO FOI POSSÍVEL AUTENTICAR A CONTA %02d]CRESET\n", argp->ID);
+			cprintf(CRED, "[NÃO FOI POSSÍVEL AUTENTICAR A CONTA %02d]", argp->ID);
 		}
 	}else{
-		printf("CRED[NÃO FOI POSSÍVEL VALIDAR O CÓDIGO %02d]CRESET\n", argp->codigo);
+		cprintf(CRED, "[NÃO FOI POSSÍVEL VALIDAR O CÓDIGO %02d]", argp->codigo);
 	}
 	if(!desativa_codigo(argp->codigo)){
-		printf("CRED[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]CRESET\n", argp->codigo);
+		cprintf(CRED, "[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]", argp->codigo);
 	}
 	if(FAIL_FLAG){ return NULL; }
 	return &result;
@@ -177,10 +180,10 @@ solicita_fechamento_100_svc(transacao *argp, struct svc_req *rqstp)
 		}
 		n = n->next;
 	}else{
-		printf("CRED[NÃO FOI POSSÍVEL VALIDAR O CÓDIGO %02d]CRESET\n", argp->codigo);
+		cprintf(CRED, "[NÃO FOI POSSÍVEL VALIDAR O CÓDIGO %02d]", argp->codigo);
 	}
 	if(!desativa_codigo(argp->codigo)){
-		printf("CRED[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]CRESET\n", argp->codigo);
+		cprintf(CRED, "[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]", argp->codigo);
 	}
 	if(FAIL_FLAG){ return NULL; }
 	return &result;
@@ -201,10 +204,10 @@ solicita_deposito_100_svc(transacao *argp, struct svc_req *rqstp)
 			printf("CRED[NÃO FOI POSSÍVEL DEPOSITAR %.2f NA CONTA %d\n]CRESET", argp->valor, argp->ID);
 		}
 	}else{
-		printf("CRED[NÃO FOI POSSÍVEL VALIDAR O CÓDIGO %02d]CRESET\n", argp->codigo);
+		cprintf(CRED, "[NÃO FOI POSSÍVEL VALIDAR O CÓDIGO %02d]", argp->codigo);
 	}
 	if(!desativa_codigo(argp->codigo)){
-		printf("CRED[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]CRESET\n", argp->codigo);
+		cprintf(CRED, "[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]", argp->codigo);
 	}
 	if(FAIL_FLAG){ return NULL; }
 	return &result;
@@ -225,10 +228,10 @@ solicita_retirada_100_svc(transacao *argp, struct svc_req *rqstp)
 			printf("CRED[NÃO FOI POSSÍVEL RETIRAR %.2f DA CONTA %d]CRESET\n", argp->valor, argp->ID);
 		}
 	}else{
-		printf("CRED[NÃO FOI POSSÍVEL VALIDAR O CÓDIGO %02d]CRESET\n", argp->codigo);
+		cprintf(CRED, "[NÃO FOI POSSÍVEL VALIDAR O CÓDIGO %02d]", argp->codigo);
 	}
 	if(!desativa_codigo(argp->codigo)){
-		printf("CRED[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]CRESET\n", argp->codigo);
+		cprintf(CRED, "[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]", argp->codigo);
 	}
 	if(FAIL_FLAG){ return NULL; }
 	return &result;
@@ -249,10 +252,10 @@ solicita_consulta_100_svc(transacao *argp, struct svc_req *rqstp)
 			printf("CRED[NÃO FOI POSSÍVEL CONSULTAR A CONTA %02d]CRESET\n", argp->ID);
 		}
 	}else{
-		printf("CRED[NÃO FOI POSSÍVEL VALIDAR O CÓDIGO %02d]CRESET\n", argp->codigo);
+		cprintf(CRED, "[NÃO FOI POSSÍVEL VALIDAR O CÓDIGO %02d]", argp->codigo);
 	}
 	if(!desativa_codigo(argp->codigo)){
-		printf("CRED[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]CRESET\n", argp->codigo);
+		cprintf(CRED, "[NÃO FOI POSSÍVEL DESATIVAR O CÓDIGO %02d]", argp->codigo);
 	}
 	if(FAIL_FLAG){ return NULL; }
 	return &result;
