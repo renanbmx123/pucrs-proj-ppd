@@ -12,7 +12,7 @@ SOURCES_SVC.c =
 SOURCES_SVC.h = 
 SOURCES.x = logica.x
 
-TARGETS_SVC.c = logica_svc.c logica_server.c logica_xdr.c 
+TARGETS_SVC.c = logica_svc.c logica_server.c logica_xdr.c list.c
 TARGETS_CLNT.c = logica_clnt.c logica_client.c logica_xdr.c 
 TARGETS = logica.h logica_xdr.c logica_clnt.c logica_svc.c logica_client.c logica_server.c
 
