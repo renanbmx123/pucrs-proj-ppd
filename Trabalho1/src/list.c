@@ -15,6 +15,7 @@ void list_push(List *l, void *data, size_t data_size){
         aux->next = node;
     }
     l->tail = node;
+    printf("Tam: %d\n", list_size(l));
 }
 
 void *list_get(List *l, int index){
