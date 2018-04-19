@@ -38,35 +38,64 @@ prog_100(char *host)
 	}
 #endif	/* DEBUG */
 
-//AGENCIA
+	printf("Solicitando abertura de conta\n");
 	r = solicita_codigo_100(NULL, clnt);
 	r = solicita_abertura_100(r, clnt);
-	if(r == NULL || !(*r)){
+	while(r == NULL || !(*r)){
 		puts("Resposta nula. Tentando novamente (1)");
 		r = solicita_codigo_100(NULL, clnt);
 		r = solicita_abertura_100(r, clnt);
 	}
-
 	ID = *r;
-	printf("ID: %d\n", ID);
+	printf("Conta aberta com ID: %d\n", ID);
 
+	printf("Solicitando autenticação da conta de ID: %d\n", ID);
+	t = solicita_transacao(clnt, ID, 0);
+	r = solicita_autenticacao_100(&t, clnt);
+	while(r == NULL || !(*r)){
+		puts("Resposta inválida. Tentando novamente (2)");
+		t = solicita_transacao(clnt, ID, 0);
+		r = solicita_autenticacao_100(&t, clnt);
+	}
+
+	printf("Solicitando deposito de $100\n");
 	t = solicita_transacao(clnt, ID, 100);
 	r = solicita_deposito_100(&t, clnt);
-	if(r == NULL || !(*r)){
-		puts("Resposta inválida. Tentando novamente (2)");
+	while(r == NULL || !(*r)){
+		puts("Resposta inválida. Tentando novamente (3)");
 		t = solicita_transacao(clnt, ID, 100);
 		r = solicita_deposito_100(&t, clnt);
 	}
 
+	printf("Solicitando consulta da conta de ID: %d\n", ID);
 	t = solicita_transacao(clnt, ID, 0);
 	c = solicita_consulta_100(&t, clnt);
-	if(c == NULL || !c->ID){
-		puts("Resposta inválida. Tentando novamente (3)");
+	while(c == NULL || !c->ID){
+		puts("Resposta inválida. Tentando novamente (4)");
 		t = solicita_transacao(clnt, ID, 0);
 		c = solicita_consulta_100(&t, clnt);
 	}
+	printf("Consulta realizada -> ID: %d Saldo: %.2f\n", c->ID, c->Saldo);
 
-	printf("ID: %d\nSaldo: %.2f\n", c->ID, c->Saldo);
+	printf("Solicitando saque de $40\n");
+	t = solicita_transacao(clnt, ID, 40);
+	r = solicita_retirada_100(&t, clnt);
+	while(r == NULL || !(*r)){
+		puts("Resposta inválida. Tentando novamente (5)");
+		t = solicita_transacao(clnt, ID, 40);
+		r = solicita_retirada_100(&t, clnt);
+	}
+
+
+	printf("Solicitando consulta da conta de ID: %d\n", ID);
+	t = solicita_transacao(clnt, ID, 0);
+	c = solicita_consulta_100(&t, clnt);
+	while(c == NULL || !c->ID){
+		puts("Resposta inválida. Tentando novamente (6)");
+		t = solicita_transacao(clnt, ID, 0);
+		c = solicita_consulta_100(&t, clnt);
+	}
+	printf("Consulta realizada -> ID: %d Saldo: %.2f\n", c->ID, c->Saldo);
 	/*result_1 = solicita_codigo_100((void*)&solicita_codigo_100_arg, clnt);
 	if (result_1 == (int *) NULL) {
 		clnt_perror (clnt, "call failed");
