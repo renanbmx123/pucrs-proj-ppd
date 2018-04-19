@@ -12,7 +12,7 @@
 
 \setlength{\columnsep}{1cm}
 \setlength{\parindent}{0em}
-\titlespacing{\section}{0pt}{*0}{*0}
+\titlespacing{\section}{1pt}{*0.5}{*0.5}
 
 \begin{document}
 
@@ -25,85 +25,24 @@
 
 \section{Implementação}
 
-A fim de avaliar a viabilidade de balanceamento de carga em um
-ambiente sem disponibilidade de alocação dinâmica de nodos, como
-no caso do LAD, implementou-se um codigo que busca balancear a
-carga de trabalho entre todos os nodos alocados manualmente para
-o MPI. O critério utilizado foi o seguinte: cada nodo deve processar
-quantidade semelhante de trabalho em relação aos demais nodos,
-independentemente da quantidade de processos executados
-localmente. A partir da alocação manual, a quantidade de processos
-executados em cada nodo pode variar, pois o MPI os distribui entre
-os nodos alocados através de um algoritmo semelhante a um Round
-Robin. Desta forma, processos alocados em nodos com uma maior
-quantidade de processos receberão unidades de trabalho
-proporcionalmente menores do que processos que executem em
-nodos com menor quantidade de processos alocados. O algoritmo
-implementado foi um mergesort, também implementado em versão
-sequencial (não paralela) para referência de speed up. A figura 1
-mostra um mapa de execução de exemplo, considerando-se um
-vetor com N = 500, 5 nodos alocados e 7 processos paralelos
-disparados.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=4cm, height=4cm]{lion.png}
-    \caption{Leão fofo}
-\end{figure}
-
-Conforme mostra a figura 1, o processo raiz (rank = 0) inicia com
-uma unidade de trabalho contendo 500 elementos, sendo que
-processará 50 localmente, repassando cerca de 250 elementos para
-o processo 1 e mais 200 para o processo 2. Por sua vez, o processo 1,
-ao receber os 250 elementos, processará 50 elementos localmente,
-repassando o restante para seus filhos, e assim por diante. Porém,
-diferentemente de um algoritmo de D\&C clássico, onde a
-quantidade de trabalho processada localmente (conquistada)
-depende de um valor delta pré-configurado, nesta abordagem a
-quantidade absoluta de elementos a ser conquistada dependerá do
-valor indicado no mapa de execução para cada processo, assim
-como a quantidade de elementos a ser repassada a cada filho
-imediato. Este mapa de execução, por sua vez, é enviado pelo
-processo raiz a todos os demais processos trabalhadores por uma
-operação de broadcast após uma fase de escuta (onde a raiz recebe
-de todos os processos trabalhadores seus ranks e identificadores
-dos nodos onde estão sendo executados) e montagem do mapa de
-execução. 
+O objetivo do trabalho proposto é implementar um sistema distribuído baseado no modelo Cliente/Servidor utilizando a biblioteca RPC, simulando operações bancárias. Primeiramente, utilizamos da ferramenta rpcgen que vem junto com a biblioteca RPC para gerarmos a aplicação Cliente/Servidor de forma modular a partir de um programa convencional, portanto, escrevemos um código com o cabeçalho das funções especificadas no trabalho, para gerar a estrutura padrão IDF que será usada. A partir disso, foi obtido todos os scripts necessários para a comunicação, como o código cliente e servidor, e o header (na linguagem c) - entre outros -, facilitando o nosso trabalho. Com isso, resta apenas a implementação da lógica proposta e da resolução do problema da idempotência, ambos explicados no decorrer do relatório.
+\newline
+Através dos códigos gerados, começamos a implementar a lógica das funções, para tal, fizemos uma estrutura auxiliar de um lista encadeada para armazenar os códigos gerados quando uma operação bancária é realizada e as contas criadas para os clientes, como também, um header contendo as "structs" bases utilizadas Conta e Transação. O código do Cliente realiza a chamada das funções que serão realizadas sobre o Servidor, na implementação, a cada execução do código fazemos uma série de operações bancárias pré-estabelecidas, primeiramente é solicitado ao Servidor o código para a operação, para, assim, abrir a conta. Logo após, a cada nova operação bancária é realizada uma solicitação de transação, retornando a estrutura que será usada na chamada seguinte, de forma que possa controlar qual o ID, cliente e em qual conta será realizada a tarefa. \newline
+Na parte do Servidor, foram criadas três funções auxiliares: uma para validar o código sempre antes que realizar a operação, uma para desativar o código gerado sempre ao final da operação, de nomo que este número fique disponível para novas tarefas, e uma função que busca uma conta na lista através do ID da mesma. As funções que realizam as operações tem a mesma estrutura, primeiro o código é validado, depois a operação é realizada conforme as suas características e por fim o código é retirado de sua lista encadeada (desativação), retornando ao cliente a resposta da operação feita.
+\newline
+O problema da idempotência foi corrigido ao atribuirmos códigos para as operações, primeiramente o problema é forçado a cada cinco tarefas realizadas, ou seja, para cada cinco códigos gerados uma FLAG é colocada em nível lógico alto, caracterizando que a próxima tarefa garantidamente não-idempotente, não deve ser realizada. Para forçar o erro, a função retorna NULL, o código Cliente tenta executar de novo a mesma operação, com o mesmo código e ID, como o servidor realizou a operação mas não houve o ACK para o Cliente, uma mensagem de erro aparece ao usuário, dizendo que não foi possível validar o código, pois o mesmo já foi executado, garantindo a não-idempotência.
 
 \section{Dificuldades encontradas}
-Depuração do código MPI; alta complexidade dos testes.
+Entendimento da biblioteca RPC, como também da criação do código usando a função rpcgen; Elaboração da ideia para solucionar o problema da idempotência, sanada ao debatermos ideais com o professor.
 
 \section{Testes}
-Foram executados testes com alocação de 2 nodos no cluster Gates,
-com execução do código sequencial e do código paralelo com 3, 7 e
-15 processos paralelos. A quantidade de processos ímpar foi
-utilizada a fim de manter a árvore de processos sempre simétrica. A
-quantidade de trabalho inicial para todos os cenários testados foi
-fixada em 220 elementos ordenados decrescentemente, de forma a
-gerar sempre o pior caso para o mergesort.
+
 
 \section{Análise do Desempenho}
-A versão paralela do mergesort obteve um desempenho superior a
-versão sequencial especialmente quando o número de processos é
-pequeno, conforme mostrado na figura 2. No entanto, o
-desempenho degrada a medida em que a quantidade de processos é
-aumentada. Provavelmente, este comportamento se deve ao
-overhead gerado pela fase de escuta e pelo processamento e envio
-do mapa de execução, que é centralizado no processo raiz e gera
-aumento significativo na quantidade de mensagens trocadas, além
-de provavelmente gerar um pequeno delay aos trabalhadores logo
-no início do processamento.
+
 
 \section{Observações Finais}
-O balanceamento de carga se mostrou viável para o algoritmo de
-mergesort implementado na forma de D\&C em um ambiente sem
-alocação dinâmica de recursos. A degradação do desempenho
-verificada com o aumento da quantidade de processos pode ser
-mitigada limitando-se o lançamento de um processo por núcleo
-disponível por nodo, conforme sugerem os resultados. Ainda, este
-desempenho provavelmente poderá ser melhorado ao se utilizarem
-de estruturas não bloqueantes de comunicação MPI.
-Fontes no LAD: $/home/filipo.mor/PP/balanced_mergeso$
+
 
 \end{multicols*}
 \end{document}
