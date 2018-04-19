@@ -36,13 +36,13 @@ O problema da idempotência foi corrigido ao atribuirmos códigos para as opera�
 Entendimento da biblioteca RPC, como também da criação do código usando a função rpcgen; Elaboração da ideia para solucionar o problema da idempotência, sanada ao debatermos ideais com o professor.
 
 \section{Testes}
-
+Como falado anteriormente, realizamos testes estáticos das funções propostas de tal forma a abranger todas as operações, retornando ao Cliente uma resposta na tala para cada uma, demonstrando o que foi feito e qual o resultado da operação, como também, se ela foi ou não bem sucedida. Por fim, o teste da idempotência foi exemplificado na seção sobre a implementação, retornando ao usuário que a operação não pode ser realizada.
 
 \section{Análise do Desempenho}
-
+A respeito da análise do desempenho, não realizamos nenhum teste específico para obtermos uma métrica, pois o mesmo não teve caráter fundamental para o entendimento do trabalho.
 
 \section{Observações Finais}
-
+O estudo sobre operações não-idempotentes é de fundamental importância para o desenvolvimento e execução correta de códigos que devem ser garantidamente não repetidos caso uma falha ocorra, sempre realizando uma implementação correta para tratar esses erros, mesmo que simples. Outro ponto importante é o entendimento e o uso da biblioteca RPC para a simulação de uma comunicação de sistemas distribuídos, já que a mesma dispõe de boa parte dos requisitos para essa comunicação ocorra corretamente. 
 
 \end{multicols*}
 \end{document}
