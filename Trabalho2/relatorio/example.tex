@@ -1,0 +1,48 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{blindtext}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage[compact]{titlesec}
+\usepackage{multicol}
+\usepackage[a4paper, total={7.5in, 10in}]{geometry}
+
+\setlength{\columnsep}{1cm}
+\setlength{\parindent}{0em}
+\titlespacing{\section}{1pt}{*0.5}{*0.5}
+
+\begin{document}
+
+\begin{multicols*}{2}
+\textbf{Relatório de Entrega de Trabalho} \newline
+\textbf{Disciplina de programação Paralela (PP)}\newline 
+\textbf{Prof. César De Rose} \newline
+\textbf{Alunos:} Rafael Rios e Rodrigo Silveira \newline
+\textbf{Exercício:} TPD1: Modelo Cliente/Servidor (RPC) \newline
+
+\section{Implementação}
+
+O objetivo do trabalho proposto é implementar um sistema distribuído baseado no modelo Cliente/Servidor utilizando a biblioteca RPC, simulando operações bancárias. Primeiramente, utilizamos da ferramenta rpcgen que vem junto com a biblioteca RPC para gerarmos a aplicação Cliente/Servidor de forma modular a partir de um programa convencional, portanto, escrevemos um código com o cabeçalho das funções especificadas no trabalho, para gerar a estrutura padrão IDF que será usada. A partir disso, foi obtido todos os scripts necessários para a comunicação, como o código cliente e servidor, e o header (na linguagem c) - entre outros -, facilitando o nosso trabalho. Com isso, resta apenas a implementação da lógica proposta e da resolução do problema da idempotência, ambos explicados no decorrer do relatório.
+\newline
+Através dos códigos gerados, começamos a implementar a lógica das funções, para tal, fizemos uma estrutura auxiliar de um lista encadeada para armazenar os códigos gerados quando uma operação bancária é realizada e as contas criadas para os clientes, como também, um header contendo as "structs" bases utilizadas Conta e Transação. O código do Cliente realiza a chamada das funções que serão realizadas sobre o Servidor, na implementação, a cada execução do código fazemos uma série de operações bancárias pré-estabelecidas, primeiramente é solicitado ao Servidor o código para a operação, para, assim, abrir a conta. Logo após, a cada nova operação bancária é realizada uma solicitação de transação, retornando a estrutura que será usada na chamada seguinte, de forma que possa controlar qual o ID, cliente e em qual conta será realizada a tarefa. \newline
+Na parte do Servidor, foram criadas três funções auxiliares: uma para validar o código sempre antes que realizar a operação, uma para desativar o código gerado sempre ao final da operação, de nomo que este número fique disponível para novas tarefas, e uma função que busca uma conta na lista através do ID da mesma. As funções que realizam as operações tem a mesma estrutura, primeiro o código é validado, depois a operação é realizada conforme as suas características e por fim o código é retirado de sua lista encadeada (desativação), retornando ao cliente a resposta da operação feita.
+\newline
+O problema da idempotência foi corrigido ao atribuirmos códigos para as operações, primeiramente o problema é forçado a cada cinco tarefas realizadas, ou seja, para cada cinco códigos gerados uma FLAG é colocada em nível lógico alto, caracterizando que a próxima tarefa garantidamente não-idempotente, não deve ser realizada. Para forçar o erro, a função retorna NULL, o código Cliente tenta executar de novo a mesma operação, com o mesmo código e ID, como o servidor realizou a operação mas não houve o ACK para o Cliente, uma mensagem de erro aparece ao usuário, dizendo que não foi possível validar o código, pois o mesmo já foi executado, garantindo a não-idempotência.
+
+\section{Dificuldades encontradas}
+Entendimento da biblioteca RPC, como também da criação do código usando a função rpcgen; Elaboração da ideia para solucionar o problema da idempotência, sanada ao debatermos ideais com o professor.
+
+\section{Testes}
+Como falado anteriormente, realizamos testes estáticos das funções propostas de tal forma a abranger todas as operações, retornando ao Cliente uma resposta na tala para cada uma, demonstrando o que foi feito e qual o resultado da operação, como também, se ela foi ou não bem sucedida. Por fim, o teste da idempotência foi exemplificado na seção sobre a implementação, retornando ao usuário que a operação não pode ser realizada.
+
+\section{Análise do Desempenho}
+A respeito da análise do desempenho, não realizamos nenhum teste específico para obtermos uma métrica, pois o mesmo não teve caráter fundamental para o entendimento do trabalho.
+
+\section{Observações Finais}
+O estudo sobre operações não-idempotentes é de fundamental importância para o desenvolvimento e execução correta de códigos que devem ser garantidamente não repetidos caso uma falha ocorra, sempre realizando uma implementação correta para tratar esses erros, mesmo que simples. Outro ponto importante é o entendimento e o uso da biblioteca RPC para a simulação de uma comunicação de sistemas distribuídos, já que a mesma dispõe de boa parte dos requisitos para essa comunicação ocorra corretamente. 
+
+\end{multicols*}
+\end{document}
