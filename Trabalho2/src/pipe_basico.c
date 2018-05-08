@@ -20,6 +20,11 @@ main(int argc, char** argv)
   int coordenador;            
   MPI_Status status; // estrutura que guarda o estado de retorno          
 
+    if(argc < 3){
+        printf("Usage: ./%s <processo que detecta a falha> <coordenador>\n", argv[0]);
+        exit(0);
+    }    
+
   MPI_Init(&argc , &argv); // funcao que inicializa o MPI, todo o codigo paralelo estah abaixo
 
   MPI_Comm_rank(MPI_COMM_WORLD, &ID); // pega pega o numero do processo atual (rank)
@@ -30,46 +35,30 @@ main(int argc, char** argv)
   memset(candidatos, -1, proc_n + 1);
 
   //Solicita eleicao se detecta desconexao com o coordenador
-  if(/* testar falha */){
+  if(ID == atoi(argv[1]){
+    printf("Processo %d solicitando eleicao!", ID);              
     solicitar_eleicao(ID, candidatos, proc_n + 1);
     cadastrar_candidato(ID, candidatos);
 
-    MPI_Send(candidatos, proc_n + 1, MPI_INT, ID + 1, 1, MPI_COMM_WORLD); //E se for o ultimo?
+    //Envia adiante o pedido de eleição
+    MPI_Send(candidatos, proc_n + 1, MPI_INT, ((ID + 1) % proc_n), 1, MPI_COMM_WORLD); 
+    //Aguarda conclusão do cadastramento dos candidatos
     MPI_Recv(candidatos, proc_n + 1, MPI_INT, ID - 1, MPI_ANY_TAG, MPI_COMM_WORLD, &status);//E se for o primeiro?
     
+    //Realiza eleição
     coordenador = escolher_candidato(candidatos, proc_n + 1);
-    MPI_Send(&coordenador, 1, MPI_INT, ID + 1, 1, MPI_COMM_WORLD); //E se for o ultimo?
+    printf("Eleito como coordenador o processo %d!", coordenador);
+    //Propaga a escolha do coordenador eleito
+    MPI_Send(&coordenador, 1, MPI_INT, ((ID + 1) % proc_n), 1, MPI_COMM_WORLD);
   }
 
   //Espera pedido de eleição
   MPI_Recv(candidatos, proc_n + 1, MPI_INT, ID - 1, MPI_ANY_TAG, MPI_COMM_WORLD, &status);//E se for o primeiro?
   cadastrar_candidato(ID, candidatos);
-  MPI_Send(candidatos, proc_n + 1, MPI_INT, ID + 1, 1, MPI_COMM_WORLD);//E se for o ultimo?
+  MPI_Send(candidatos, proc_n + 1, MPI_INT, ((ID + 1) % proc_n), 1, MPI_COMM_WORLD);
   //Espera escolha do novo coordenador
   MPI_Recv(&coordenador, 1, MPI_INT, ID - 1, MPI_ANY_TAG, MPI_COMM_WORLD, &status);//E se for o primeiro?
 }
-
-
-
-  // receber da esquerda
-
-  if ( ID == 0 ) // sou o primeiro?
-     message = 5;     // sim, sou o primeiro, crio a mensagem sem receber
-  else
-     MPI_Recv(&message, 1, MPI_INT, ID-1, MPI_ANY_TAG, MPI_COMM_WORLD, &status); // recebo da esquerda
-     
-  // processo mensagem
-
-  printf("Pid: %d, mensagem %d\n", ID, message); // mostro mensagem na tela 
-  message +=1; // incremento um na mensagem recebida
-
-  // enviar para a direita
-
-  if ( ID == proc_n-1 ) // sou o utlimo?
-     printf("Pid: %d, sou o ultimo!\n", ID); // mostro mensagem na tela pois sou o ultimo
-  else
-     MPI_Send(&message, 1, MPI_INT, ID+1, 1, MPI_COMM_WORLD); // envio para a direita
-
   MPI_Finalize();
   free(candidatos);
 }
