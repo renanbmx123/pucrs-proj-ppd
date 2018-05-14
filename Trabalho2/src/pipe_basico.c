@@ -6,7 +6,7 @@
 void imprimir_candidatos(int, int *);
 void solicitar_eleicao(int, int*, int);
 void cadastrar_candidato(int, int*);
-int escolher_candidato(int*, int);
+int escolher_candidato(int*);
 
 main(int argc, char** argv)
 {
@@ -32,6 +32,7 @@ main(int argc, char** argv)
     do {//Não vai ser o [0] que detecta a falha
       ID_detecta_falha = rand() % proc_n;
     } while(ID_detecta_falha == 0);
+    printf("Coordenador [%2d] falha.\n", proc_n - 1);
     printf("Processo [%2d] detecta a falha.\n", ID_detecta_falha);
     //Propaga quem detectará a falha pelo anel
     MPI_Send(&ID_detecta_falha, 1, MPI_INT, 1, 1, MPI_COMM_WORLD);
@@ -50,25 +51,24 @@ main(int argc, char** argv)
 
   //Solicita eleicao se detecta desconexao com o coordenador
   if(ID == ID_detecta_falha){
-    printf("Processo %d solicitando eleicao!\n", ID);                  
+    printf("Processo [%d] solicitando eleicao!\n", ID);                  
     solicitar_eleicao(ID, candidatos, proc_n + 1);
     cadastrar_candidato(ID, candidatos);
     //Envia adiante o pedido de eleição
     MPI_Send(candidatos, proc_n + 1, MPI_INT, ((ID + 1) % proc_n), 1, MPI_COMM_WORLD); 
     //Aguarda conclusão do cadastramento dos candidatos
-    printf("[%d] Esperando receber de [%d]\n", ID, (ID + proc_n - 1) % proc_n);
+    printf("[%d] Esperando receber lista de candidatos de [%d].\n", ID, (ID + proc_n - 1) % proc_n);
     MPI_Recv(candidatos, proc_n + 1, MPI_INT, (ID + proc_n - 1) % proc_n, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
     printf("Recebido!\n"); 
     //Realiza eleição
-    coordenador = escolher_candidato(candidatos, proc_n + 1);
-    printf("Eleito como coordenador o processo %d!\n", coordenador);
+    coordenador = escolher_candidato(candidatos);
+    printf("[%d] Elegeu como coordenador o processo %d!\n", ID, coordenador);
     //Propaga a escolha do coordenador eleito
     MPI_Send(&coordenador, 1, MPI_INT, ((ID + 1) % proc_n), 1, MPI_COMM_WORLD);
   }else{
     //Espera pedido de eleição
     MPI_Recv(candidatos, proc_n + 1, MPI_INT, (ID + proc_n - 1) % proc_n, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-    //O coordenador com falha não se cadastra e está 4 posições à frente de quem detecta a falha
-    if(ID != ((ID_detecta_falha + 4 + 1) % proc_n)){
+    if(ID != (proc_n - 1)){
       cadastrar_candidato(ID, candidatos);
     }else{
       printf("[%d] não se cadastrou!\n", ID);
@@ -99,8 +99,9 @@ void cadastrar_candidato(int ID, int* candidatos){
   //imprimir_candidatos(ID, candidatos);
 }
 
-int escolher_candidato(int* candidatos, int n){
+int escolher_candidato(int* candidatos){
   int i, melhor_candidato = candidatos[1];
+  int n = candidatos[0];
   for(i = 1; i < n; i++){
     melhor_candidato = (melhor_candidato > candidatos[i]) ? melhor_candidato : candidatos[i];
   }
