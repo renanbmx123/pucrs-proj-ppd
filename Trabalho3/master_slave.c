@@ -17,6 +17,22 @@ void print_line(int c, int *line){
 	printf("\n");
 }
 
+void bubble_sort (int *a, int n) {
+    int i, t, j = n, s = 1;
+    while (s) {
+        s = 0;
+        for (i = 1; i < j; i++) {
+            if (a[i] < a[i - 1]) {
+                t = a[i];
+                a[i] = a[i - 1];
+                a[i - 1] = t;
+                s = 1;
+            }
+        }
+        j--;
+    }
+}
+
 main(int argc, char **argv)
 {
 	int i, j, prox_tarefa, pos;
@@ -73,7 +89,8 @@ main(int argc, char **argv)
 			MPI_Recv(message, c, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 			if(status.MPI_TAG == KILLTAG) break;
 			qsort(message, c, sizeof(int), cmpfunc);
-			MPI_Ssend(message, c, MPI_INT, 0, WORKTAG, MPI_COMM_WORLD);
+			//bubble_sort(message,c);
+			MPI_Send(message, c, MPI_INT, 0, WORKTAG, MPI_COMM_WORLD);
 		}
 	} 
 	MPI_Finalize();
