@@ -1,14 +1,18 @@
 x= 4:4:32
-y= [149.432170 64.111334 42.962223 31.596678 30.678795 29.706708 29.299245 29.187384]
-z= [2.743756 1.291567 1.205017 1.170739 1.188735 1.150035 1.245534 1.241888]
-plot_bub = plot(x,y,'linewidth',10);
-plot_bub2 = plot(x,y,'--r','marker','o','markerfacecolor','r','markersize',10);
-labelx_h = xlabel('número de processos','fontsize',25);
-labely_h = ylabel('tempo em segundos','fontsize',25);
-legend_h = legend('BubbleSort','location','southwest','orientation','horizontal');
+su_bub= [1.266380 2.951709 4.404753 5.989174 6.168365 6.370211 6.458801 6.483555]
+ef_bub= [0.316595 0.368964 0.367063 0.374323 0.308418 0.265425 0.230671 0.202611]
+su_q= [1.792433 3.807778 4.081270 4.200765 4.137171 4.276391 3.948507 3.960099]
+ef_q= [0.448108 0.475972 0.340106 0.262548 0.206859 0.178183 0.141018 0.123753]
+plot_su_bub2 = plot(x,su_bub,'--r','marker','o','markerfacecolor','r','markersize',10);
+hold on
+plot_su_q2 = plot(x,su_q,'--b','marker','o','markerfacecolor','b','markersize',10);
+labelx_h = xlabel('Número de processos','fontsize',25);
+labelx_h = ylabel('Speed-Up','fontsize',25);
+legend_h = legend('Speed-Up Bubble Sort', 'Speed-Up Quick Sort', 'location','southeast','orientation','horizontal');
 figure
-plot_quick = plot(x,z,'linewidth',10);
-plot_quick2 = plot(x,z,'--b','marker','o','markerfacecolor','b','markersize',10);
-labelx_h = xlabel('número de processos','fontsize',25);
-labely_h = ylabel('tempo em segundos','fontsize',25);
-legend_h = legend('QuickSort','location','southwest','orientation','horizontal');
+plot_ef_bub2 = plot(x,ef_bub,'--r','marker','o','markerfacecolor','r','markersize',10);
+hold on
+plot_ef_q2 = plot(x,ef_q,'--b','marker','o','markerfacecolor','b','markersize',10);
+labelx_h = xlabel('Número de processos','fontsize',25);
+labelx_h = ylabel('Eficiencia','fontsize',25);
+legend_h = legend('Eficiencia Bubble Sort', 'Eficiencia Quick Sort','location','southwest','orientation','horizontal');
