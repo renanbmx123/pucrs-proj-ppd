@@ -56,15 +56,15 @@ main(int argc, char **argv)
 	//Vetor de controle de processos
 	controle = calloc(proc_n - 1, sizeof *controle);
 
-	if(ID == 0){
+	if(ID == 0){			//MESTRE
 		timestamp_inicial = MPI_Wtime();	
-		for(i = 1; i < proc_n; i++){
+		for(i = 1; i < proc_n; i++){			//Rajada inicial de tarefas
 			controle[i-1] = i; 
 			MPI_Send(m[i-1], c, MPI_INT, i, WORKTAG, MPI_COMM_WORLD);
 			print_line(proc_n-1, controle);
 		}
 		prox_tarefa = (proc_n-1)-1;
-		while(++prox_tarefa < l){
+		while(++prox_tarefa < l){				//Enquanto tiver tarefas para executar
 			MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 			pos = controle[status.MPI_SOURCE-1];
 			MPI_Recv(m[pos], c, MPI_INT, status.MPI_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
@@ -73,7 +73,7 @@ main(int argc, char **argv)
 			MPI_Send(m[prox_tarefa], c, MPI_INT, status.MPI_SOURCE, WORKTAG, MPI_COMM_WORLD);
 			print_line(proc_n-1, controle);
 		}
-		for(i = 0; i < proc_n - 1; i++){
+		for(i = 0; i < proc_n - 1; i++){		//Recebe últimas tarefas e manda KILLTAG
 			if(controle[i] != 0){
 				pos = controle[i];
 				MPI_Recv(m[pos], c, MPI_INT, i+1, MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
@@ -84,7 +84,7 @@ main(int argc, char **argv)
 		timestamp_final = MPI_Wtime();
 		printf("Tempo de execucao: %f\n", timestamp_final - timestamp_inicial);
 	}
-	else{
+	else{				//ESCRAVOS
 		while(1){
 			MPI_Recv(message, c, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 			if(status.MPI_TAG == KILLTAG) break;

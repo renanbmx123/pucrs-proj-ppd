@@ -38,18 +38,17 @@ int main(int argc, char** argv)
   clock_t begin = clock();
   double time_spent;
   clock_t end;
+  /*Inicializa a matriz*/
   for(i=0;i<l;i++){
     for(j=0;j<c;j++){
         m[i][j]=c-j;
     }
-    //print_line(c, m[i]);
   }
+  /*Ordena a matriz*/
   for(i=0;i<l;i++){
         qsort(m[i], c, sizeof(int), cmpfunc);
-		bubble_sort(m[i],c);
+		//bubble_sort(m[i],c);
   }
-  //for(i=0;i<l;i++)
-    //print_line(c, m[i]);
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Tempo de execucao: %f seconds\n", time_spent);
