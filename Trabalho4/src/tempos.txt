@@ -5,7 +5,19 @@ np	time
 31	34.613062
 
 local
-np	time
+np	time		time total
 7	100.965177
 15	23.198266
 31	10.297053
+63	5.020627
+127	2.501075
+255	1.373406	5.636
+
+bs pos-ht:
+63	16.869221
+127	8.214938
+
+grafico de barras comparando o melhor tempo de cada
+grafico com o speed-up e eficiencia do normal + normal(pos-ht)
+
+rodar com o tempo de instanciação também, para comparar
