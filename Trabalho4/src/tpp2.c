@@ -77,12 +77,12 @@ int cmpfunc (const void * a, const void * b) {
 }
 
 #define VETOR_SIZE 1000000
-#define delta 180000
+#define delta 70000
 #define LOCAL 1
 
 /*              7       15      31
 normal          250000  125000  62500
-40% local         
+local           150000  70000   34000
 20% local       160000  64000   25600
 */
 
@@ -117,8 +117,8 @@ void main(int argc, char** argv){
   }
   else{
         if(LOCAL){      //Se for local, ordena 40% do vetor e divide 60%
-                tam_local = tam_vetor*0.2;
-                tam_divide = tam_vetor*0.8;
+                tam_local = delta;
+                tam_divide = tam_vetor-delta;
         }else{          //Se nao for local, manda todo
                 tam_local = 0;
                 tam_divide = tam_vetor;
@@ -127,7 +127,7 @@ void main(int argc, char** argv){
         MPI_Send(&vetor[tam_local + tam_divide/2], tam_divide/2, MPI_INT, 2*my_rank+2, 0, MPI_COMM_WORLD);  // mando metade final 
         if(LOCAL){
                 //qsort(vetor, tam_local, sizeof(int), cmpfunc);
-                bubble_sort(vetor, tam_vetor);
+                bubble_sort(vetor, tam_local);
         }
         MPI_Recv(&vetor[tam_local], tam_divide/2, MPI_INT, 2*my_rank+1, MPI_ANY_TAG, MPI_COMM_WORLD, &status);  //recebo metade inicial             
         MPI_Recv(&vetor[tam_local + tam_divide/2], tam_divide/2, MPI_INT, 2*my_rank+2, MPI_ANY_TAG, MPI_COMM_WORLD, &status); //recebo metade final
