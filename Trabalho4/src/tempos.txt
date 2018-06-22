@@ -1,21 +1,25 @@
 bs normal:
-np	time
-7	282.667553
-15	73.761531
-31	34.613062
+np	time		time total
+1	4440
+3	1080
+7	279.369517	280.594
+15	75.193374	76.465
+31	34.688771	35.956	
 
 local
 np	time		time total
-7	100.965177
-15	23.198266
-31	10.297053
-63	5.020627
-127	2.501075
+7	101.794609	103
+15	23.218199	24.482
+31	10.325975	11.551
+63	5.096397	6.457
+127	2.510033	4.547
 255	1.373406	5.636
 
 bs pos-ht:
-63	16.869221
-127	8.214938
+np	time		time total
+63	16.322831	17.761
+127	8.298443	10.375	
+255	4.257528	8.582
 
 grafico de barras comparando o melhor tempo de cada
 grafico com o speed-up e eficiencia do normal + normal(pos-ht)

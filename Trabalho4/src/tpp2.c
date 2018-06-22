@@ -80,10 +80,9 @@ int cmpfunc (const void * a, const void * b) {
 #define delta 70000
 #define LOCAL 1
 
-/*              7       15      31
-normal          250000  125000  62500
-local           150000  70000   34000
-20% local       160000  64000   25600
+/*              7       15      31      63      127     255
+normal          250000  125000  62500   31250   15625   8000    
+local           150000  70000   34000   16000   8000    4000
 */
 
 void main(int argc, char** argv){
@@ -115,7 +114,8 @@ void main(int argc, char** argv){
         //qsort(vetor, tam_vetor, sizeof(int), cmpfunc);
         bubble_sort(vetor, tam_vetor);
   }
-  else{
+   else{
+        float tam_filhos;
         if(LOCAL){      //Se for local, ordena 40% do vetor e divide 60%
                 tam_local = delta;
                 tam_divide = tam_vetor-delta;
@@ -123,14 +123,27 @@ void main(int argc, char** argv){
                 tam_local = 0;
                 tam_divide = tam_vetor;
         }
-        MPI_Send(&vetor[tam_local], tam_divide/2, MPI_INT, 2*my_rank+1, 0, MPI_COMM_WORLD);  // mando metade inicial do vetor
-        MPI_Send(&vetor[tam_local + tam_divide/2], tam_divide/2, MPI_INT, 2*my_rank+2, 0, MPI_COMM_WORLD);  // mando metade final 
+        tam_filhos = tam_divide/2.0;
+        if(tam_filhos != (int)(tam_filhos+0.5)){		//se for um tamanho de vetor com casa decimal, manda tam_vetor/2 e tam_vetor/2+1
+                MPI_Send(&vetor[tam_local], (int)(tam_divide/2), MPI_INT, 2*my_rank+1, 0, MPI_COMM_WORLD);  // mando metade inicial do vetor
+                MPI_Send(&vetor[tam_local + (int)(tam_divide/2)], (int)(tam_divide/2+1), MPI_INT, 2*my_rank+2, 0, MPI_COMM_WORLD);  // mando metade final 
+        }
+        else{							//se não for um tamanho de vetor com casa decimal
+                MPI_Send(&vetor[tam_local], tam_divide/2, MPI_INT, 2*my_rank+1, 0, MPI_COMM_WORLD);  // mando metade inicial do vetor
+                MPI_Send(&vetor[tam_local + tam_divide/2], tam_divide/2, MPI_INT, 2*my_rank+2, 0, MPI_COMM_WORLD);  // mando metade final 
+        }
         if(LOCAL){
                 //qsort(vetor, tam_local, sizeof(int), cmpfunc);
                 bubble_sort(vetor, tam_local);
         }
-        MPI_Recv(&vetor[tam_local], tam_divide/2, MPI_INT, 2*my_rank+1, MPI_ANY_TAG, MPI_COMM_WORLD, &status);  //recebo metade inicial             
-        MPI_Recv(&vetor[tam_local + tam_divide/2], tam_divide/2, MPI_INT, 2*my_rank+2, MPI_ANY_TAG, MPI_COMM_WORLD, &status); //recebo metade final
+        if(tam_filhos != (int)(tam_filhos+0.5)){		//se for um tamanho de vetor com casa decimal, manda tam_vetor/2 e tam_vetor/2+1
+                MPI_Recv(&vetor[tam_local], (int)(tam_divide/2), MPI_INT, 2*my_rank+1, MPI_ANY_TAG, MPI_COMM_WORLD, &status);   //recebo metade inicial             
+                MPI_Recv(&vetor[tam_local + (int)(tam_divide/2)], (int)(tam_divide/2+1), MPI_INT, 2*my_rank+2, MPI_ANY_TAG, MPI_COMM_WORLD, &status); //recebo metade final
+        }
+        else{							//se não for um tamanho de vetor com casa decimal
+                MPI_Recv(&vetor[tam_local], tam_divide/2, MPI_INT, 2*my_rank+1, MPI_ANY_TAG, MPI_COMM_WORLD, &status);  //recebo metade inicial             
+                MPI_Recv(&vetor[tam_local + tam_divide/2], tam_divide/2, MPI_INT, 2*my_rank+2, MPI_ANY_TAG, MPI_COMM_WORLD, &status); //recebo metade final
+        }
         if(LOCAL) vetor = interleaving3(&vetor[0], tam_vetor, 0, tam_local, tam_local + tam_divide/2); //ordena para local
         else vetor = interleaving(vetor, tam_vetor);    //ordena para 2 vetores
   }
@@ -144,4 +157,5 @@ void main(int argc, char** argv){
   }
   MPI_Finalize();
 }
+
 
