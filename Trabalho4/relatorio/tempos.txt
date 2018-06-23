@@ -1,0 +1,28 @@
+bubblesort com ordenação nos últimos filhos:
+np	tempo(s)	tempo total(s)	speed-up	eficiência
+1	4440				1.0		1.0
+3	1080				4.111		1.37
+7	279.369		280.594		15.893		2.27
+15	75.193 		76.465		59.05		3.94
+31	34.689		35.956		128.0		4.13
+
+bubblesort com ordenação nos últimos filhos (pós-ht):
+np	tempo(s)	tempo total(s)	speed-up	eficiência
+63	16.323		17.761		272.0		4.32
+127	8.298		10.375		535.0		4.213	
+255	4.258		8.582		1042.86		4.09
+
+bubblesort com ordenação local:
+np	tempo(s)	tempo total(s)	speed-up	eficiência
+7	101.795		103.0		43.615		6.23
+15	23.218		24.482		191.23		12.75
+31	10.326		11.551		430.0		13.87	
+63	5.096		6.457		871.20		13.83
+127	2.510		4.547		1768.92		13.93
+255	1.373		5.636		3232.84		12.68
+
+
+grafico de barras comparando o melhor tempo de cada
+grafico com o speed-up e eficiencia do normal + normal(pos-ht)
+
+rodar com o tempo de instanciação também, para comparar
